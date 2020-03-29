@@ -100,7 +100,7 @@ static _Bool is_read(const range_t *range) {
 static void scan_range(int fd, const range_t *range) {
   assert(range);
   if (!is_read(range)) {
-    printf("[+] Ignoring (not-readable range): ");
+    printf("[+] Ignoring (non-readable range): ");
     print_range(range, true);
   } else {
     printf("[+] Scanning: ");
