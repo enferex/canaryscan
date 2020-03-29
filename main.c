@@ -108,7 +108,7 @@ static void scan_range(int fd, const range_t *range) {
     for (size_t itr = 0; itr < range->size; itr += sizeof(uintptr_t)) {
       const uintptr_t addr = range->begin + itr + range->offset;
       uintptr_t data = 0;
-      if ((pread(fd, &data, sizeof(data), 0) > 0) && (data == canary))
+      if ((pread(fd, &data, sizeof(data), addr) > 0) && (data == canary))
         printf("[*] Found canary at: %p\n", addr);
     }
   }
