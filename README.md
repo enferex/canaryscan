@@ -12,9 +12,8 @@ Note that this is designed for 64bit Linux binaries.
 
 Use Cases
 ---------
-* Identify if other libraries are caching the canary value.
-* Collect a bunch of canaries that were possibly kernel (/dev/urandom)
-       generated.  For science!
+* Identify if some memory regions are caching the canary value.
+* Run this multiple times to collect numerous canary values.  For science!
 
 Building
 --------

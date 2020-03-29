@@ -16,9 +16,9 @@
 // | to the userland runtime loader (glibc's rtld.c aka ld) via an elf aux     |
 // | field.                                                                    |
 // | Use cases:                                                                |
-// |   (1) Identify if other libraries are caching the canary value.           |
-// |   (2) Collect a bunch of canaries that were possibly kernel (/dev/urandom)|
-// |       generated.  For science!                                            |
+// |   (1) Identify if some memory mapped regions are caching the canary value.|   
+// |   (2) Run this multiple times to collect numerous canary values.          |
+// |       For science!                                                        |
 // |                                                                           |
 // | This is similar to https://github.com/enferex/homingcanary                |
 // | HomingCanary scans other processes but requires root access.              |
