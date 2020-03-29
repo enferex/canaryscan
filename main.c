@@ -16,7 +16,7 @@
 // | to the userland runtime loader (glibc's rtld.c aka ld) via an elf aux     |
 // | field.                                                                    |
 // | Use cases:                                                                |
-// |   (1) Identify if some memory mapped regions are caching the canary value.|   
+// |   (1) Identify if some memory mapped regions are caching the canary value.|
 // |   (2) Run this multiple times to collect numerous canary values.          |
 // |       For science!                                                        |
 // |                                                                           |
@@ -24,7 +24,6 @@
 // | HomingCanary scans other processes but requires root access.              |
 // |                                                                           |
 // *---------------------------------------------------------------------------*
-
 
 _Static_assert(sizeof(uintptr_t) == 8, "This is designed for 64bit binaries.");
 
@@ -106,10 +105,8 @@ static void scan_range(int fd, const range_t *range) {
   } else {
     printf("[+] Scanning: ");
     print_range(range, false);
-    printf("...\n");
     for (size_t itr = 0; itr < range->size; itr += sizeof(uintptr_t)) {
-      const uintptr_t *addr =
-          (uintptr_t *)range->begin + (itr * sizeof(uintptr_t)) + range->offset;
+      const uintptr_t addr = range->begin + itr + range->offset;
       uintptr_t data = 0;
       if ((pread(fd, &data, sizeof(data), 0) > 0) && (data == canary))
         printf("[*] Found canary at: %p\n", addr);
@@ -121,7 +118,8 @@ static _Noreturn void usage(const char *execname) {
   printf(
       "Usage: %s [-h] [-q] \n"
       "  -q: Quiet mode, print this process' canary and exit.\n"
-      "  -h: Display this help message.\n", execname);
+      "  -h: Display this help message.\n",
+      execname);
   exit(EXIT_SUCCESS);
 }
 
