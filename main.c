@@ -104,7 +104,7 @@ static void scan_range(int fd, const range_t *range) {
     print_range(range, true);
   } else {
     printf("[+] Scanning: ");
-    print_range(range, false);
+    print_range(range, true);
     for (size_t itr = 0; itr < range->size; itr += sizeof(uintptr_t)) {
       const uintptr_t addr = range->begin + itr + range->offset;
       uintptr_t data = 0;
