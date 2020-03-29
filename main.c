@@ -25,6 +25,9 @@
 // |                                                                           |
 // *---------------------------------------------------------------------------*
 
+
+_Static_assert(sizeof(uintptr_t) == 8, "This is designed for 64bit binaries.");
+
 // This is set in main() and used when scanning /proc/self/maps
 static uintptr_t canary;
 
@@ -57,6 +60,16 @@ static range_t *get_ranges(void) {
 #endif
     range_t *node = calloc(1, sizeof(range_t));
     char *range_str = strdup(strtok(line, " "));
+
+    // The upper bit is 1 for kernel space memory, which we cannot touch.
+    // Since we extracted this value from an ascii string, just check the
+    // most significant nybble is F, which is not entirely correct, but should
+    // suffice.
+    if (range_str[0] == 'F' || range_str[0] == 'f') {
+      printf("[+] Skipping potential kernel space memory: %s\n", range_str);
+      continue;
+    }
+
     node->perms = strdup(strtok(NULL, " "));
     node->offset = strtoll(strtok(NULL, " "), NULL, 16);
     const uintptr_t begin = strtoll(strtok(range_str, "-"), NULL, 16);
@@ -105,11 +118,49 @@ static void scan_range(int fd, const range_t *range) {
   }
 }
 
-int main(void) {
+static _Noreturn void usage(const char *execname) {
+  printf(
+      "Usage: %s [-h] [-q] \n"
+      "  -q: Quiet mode, print this process' canary and exit.\n"
+      "  -h: Display this help message.\n", execname);
+  exit(EXIT_SUCCESS);
+}
+
+int main(int argc, char **argv) {
+  _Bool quiet_mode = false;
+
+  // Args
+  if (argc > 2) usage(argv[0]);
+  for (int i = 1; i < argc; ++i) {
+    if (argv[i][0] != '-') {
+      fprintf(stderr, "Unexpected flag.  See usage: '-h'\n");
+      exit(EXIT_FAILURE);
+    }
+    switch (argv[i][1]) {
+      case 'h':
+        usage(argv[0]);
+        break;
+      case 'q':
+        quiet_mode = true;
+        break;
+      default:
+        fprintf(stderr, "Unexpected flag.  See usage: '-h'\n");
+        exit(EXIT_FAILURE);
+        break;
+    }
+  }
+
   // Copy the canary in an easier place to access.
   asm volatile("mov %%fs:0x28, %0\n\t" : "=r"(canary));
-  printf("[+] Canary: 0x%zu\n", canary);
 
+  // Quiet mode. (Avoid printing the [+] status ascii icon.)
+  if (quiet_mode) {
+    printf("Canary: 0x%016lx\n", canary);
+    exit(EXIT_SUCCESS);
+  }
+
+  // Scan mode.
+  printf("[+] Canary: 0x%016lx\n", canary);
   const int fd = open("/proc/self/mem", O_RDONLY | __O_LARGEFILE);
   if (fd < 0) {
     fprintf(stderr, "[-] Error opening memory map: %s\n", strerror(errno));

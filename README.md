@@ -8,6 +8,8 @@ field.
 This is similar to https://github.com/enferex/homingcanary
 HomingCanary scans other processes but requires root access.
 
+Note that this is designed for 64bit Linux binaries.
+
 Use Cases
 ---------
 * Identify if other libraries are caching the canary value.
