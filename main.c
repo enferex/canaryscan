@@ -152,7 +152,7 @@ int main(int argc, char **argv) {
 
   // Quiet mode. (Avoid printing the [+] status ascii icon.)
   if (quiet_mode) {
-    printf("Canary: 0x%016lx\n", canary);
+    printf("Canary: 0x%016lx, PID: %llu\n", canary, getpid());
     exit(EXIT_SUCCESS);
   }
 
