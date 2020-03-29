@@ -34,16 +34,18 @@ static uintptr_t canary;
 
 // Specify a memory range (this is populated from /proc/self/maps entries).
 typedef struct _range_t {
-  uintptr_t begin;    // Start address (first item in /proc/self/maps)
-  const char *perms;  // Permission string (second column in /proc/self/maps)
-  size_t offset;      // Offset (third column in /proc/self/maps)
+  uintptr_t begin;    // Start address (first item in /proc/self/maps).
+  const char *perms;  // Permission string (second column in /proc/self/maps).
+  size_t offset;      // Offset (third column in /proc/self/maps).
   size_t size;        // End - Begin: first column /proc/self/maps range.
+  char *pathname;     // Text describing the memory range (or empty).
   struct _range_t *next;
 } range_t;
 
 static void print_range(const range_t *range, _Bool newline) {
   assert(range);
-  printf("%p (%zu size) (perms: %s)%c", range->begin, range->size, range->perms,
+  printf("%p (%zu size) (perms: %s) %s%c", range->begin, range->size,
+         range->perms, range->pathname ? range->pathname : "",
          newline ? '\n' : ' ');
 }
 
@@ -73,6 +75,12 @@ static range_t *get_ranges(void) {
 
     node->perms = strdup(strtok(NULL, " "));
     node->offset = strtoll(strtok(NULL, " "), NULL, 16);
+    (void)strtok(NULL, " ");  // Ignore device.
+    (void)strtok(NULL, " ");  // Ignore inode.
+    const char *pathname = strtok(NULL, " ");
+    node->pathname = pathname ? strdup(pathname) : NULL;
+    if (node->pathname && strlen(node->pathname) > 0)
+      node->pathname[strlen(node->pathname) - 1] = '\0';
     const uintptr_t begin = strtoll(strtok(range_str, "-"), NULL, 16);
     const uintptr_t end = strtoll(strtok(NULL, " "), NULL, 16);
     assert(end >= begin);
