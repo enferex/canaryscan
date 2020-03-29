@@ -8,7 +8,7 @@ field.
 This is similar to https://github.com/enferex/homingcanary
 HomingCanary scans other processes but requires root access.
 
-Note that this is designed for 64bit Linux binaries.
+Note that this is designed for x86 64bit Linux binaries.
 
 Use Cases
 ---------
@@ -19,7 +19,8 @@ Building
 --------
 1. Create a build directory. `mkdir canaryscan/build`
 1. From the just created build directory, invoke cmake with the path to the
-   libsprinkles sources. `cd canaryscan/build; cmake ../ -DCMAKE_BUILD_TYPE=Release`
+   libsprinkles sources.
+   `cd canaryscan/build; cmake ../ -DCMAKE_BUILD_TYPE=Release`
 1. Invoke `make` to build this bad boy.
 
 Contact

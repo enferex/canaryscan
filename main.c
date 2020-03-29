@@ -25,7 +25,9 @@
 // |                                                                           |
 // *---------------------------------------------------------------------------*
 
-_Static_assert(sizeof(uintptr_t) == 8, "This is designed for 64bit binaries.");
+#if !defined(__x86_64__) || !defined(__linux__)
+#error "This is designed for x86-64 linux binaries."
+#endif
 
 // This is set in main() and used when scanning /proc/self/maps
 static uintptr_t canary;
